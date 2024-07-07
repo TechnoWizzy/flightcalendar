@@ -4,40 +4,51 @@
   align-items: center;
   background-color: #f0f0f0;
   padding: 20px 0;
+  height: 100dvh;
 }
 
 .header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   width: 100%;
-  text-align: center;
   height: 6dvh;
   background-color: #007bff;
   color: white;
   margin-bottom: 1dvh;
+  font-size: 4vh;
 }
 
 .content {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   width: 100%;
 }
 
 .rbc-calendar {
-  height: 85dvh;
-  width: 65dvw;
+  height: 90dvh;
+  width: 100%;
 }
 
 .airport-selection {
   margin: 20px 0;
+  width: 90%;
 }
 
 .airport-selection label {
-  margin-right: 20px;
+  margin-right: 10px;
+  display: block;
+  margin-bottom: 5px;
 }
 
 .footer {
   text-align: center;
   margin-top: 20px;
+  justify-content: center;
+  padding: 20px;
+  font-size: 2vh;
 }
 
 .github-link {
@@ -47,4 +58,20 @@
 
 .github-link:hover {
   text-decoration: underline;
+}
+
+@media (min-width: 600px) {
+  .content {
+    flex-direction: row;
+  }
+
+  .airport-selection {
+    margin: 20px;
+    width: auto;
+  }
+
+  .airport-selection label {
+    display: inline;
+    margin-right: 20px;
+  }
 }

@@ -39,7 +39,7 @@ function FlightCalender() {
     const { isPending, error, data } = useQuery({
         queryKey: [defaultView, start, end],
         queryFn: async () => {
-            if (!sourceAirport || !destinationAirport) return[];
+            if (!sourceAirport || !destinationAirport) return [];
             return fetch(`${import.meta.env.VITE_API_URL}/flights/batch/?to=${destinationAirport}&from=${sourceAirport}&start=${start}&end=${end}`).then(res =>
                 res.json() as Promise<Flight[]>
             )
@@ -48,9 +48,9 @@ function FlightCalender() {
     });
 
     return (
-        <div className="container">
+        <div style={{ height: "100dvh" }} >
             <div className="header">
-                <h1>Flight Calendar</h1>
+                <p>Flight Calendar</p>
             </div>
             <div className="airport-selection">
                 <label>
@@ -261,9 +261,6 @@ const airports: Airport[] = [
     { code: 'MEM', city: 'Memphis'},
     { code: 'RIC', city: 'Richmond, VA'},
     { code: 'RNO', city: 'Reno, NV'},
-
-
-    // Add more airports as needed
 ].sort((a, b) => a.city.localeCompare(b.city));
 
 export default FlightCalender;
