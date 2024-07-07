@@ -48,40 +48,43 @@ function FlightCalender() {
     });
 
     return (
-        <div style={{ height: "100dvh" }} >
+        <div style={{height: "100dvh"}}>
             <div className="header">
                 <p>Flight Calendar</p>
             </div>
-            <div className="airport-selection">
-                <label>
-                    From:
-                    <select value={sourceAirport ?? undefined} onChange={(e) => {
-                        setSourceAirport(e.target.value);
-                        if (destinationAirport) window.location.reload();
-                    }}>
-                        <option value="">Select an airport</option>
-                        {airports.map((airport) => (
-                            <option key={airport.code} value={airport.code}>
-                                {airport.city} ({airport.code})
-                            </option>
-                        ))}
-                    </select>
-                </label>
-                <label>
-                    To:
-                    <select value={destinationAirport ?? undefined} onChange={(e) => {
-                        setDestinationAirport(e.target.value);
-                        if (sourceAirport) window.location.reload();
-                    }}>
-                        <option value="">Select an airport</option>
-                        {airports.map((airport) => (
-                            <option key={airport.code} value={airport.code}>
-                                {airport.city} ({airport.code})
-                            </option>
-                        ))}
-                    </select>
-                </label>
+            <div className="airport-selection-container">
+                <div className="airport-selection">
+                    <label>
+                        From:
+                        <select value={sourceAirport ?? undefined} onChange={(e) => {
+                            setSourceAirport(e.target.value);
+                            if (destinationAirport) window.location.reload();
+                        }}>
+                            <option value="">Select an airport</option>
+                            {airports.map((airport) => (
+                                <option key={airport.code} value={airport.code}>
+                                    {airport.city} ({airport.code})
+                                </option>
+                            ))}
+                        </select>
+                    </label>
+                    <label>
+                        To:
+                        <select value={destinationAirport ?? undefined} onChange={(e) => {
+                            setDestinationAirport(e.target.value);
+                            if (sourceAirport) window.location.reload();
+                        }}>
+                            <option value="">Select an airport</option>
+                            {airports.map((airport) => (
+                                <option key={airport.code} value={airport.code}>
+                                    {airport.city} ({airport.code})
+                                </option>
+                            ))}
+                        </select>
+                    </label>
+                </div>
             </div>
+
             <div className="calendar-container">
                 {isPending && (
                     <div className="spinner-overlay">
@@ -107,7 +110,8 @@ function FlightCalender() {
                 />
             </div>
             <div className="footer">
-                <a href="https://github.com/TechnoWizzy/flightcalendar-frontend/" target="_blank" rel="noopener noreferrer"
+                <a href="https://github.com/TechnoWizzy/flightcalendar-frontend/" target="_blank"
+                   rel="noopener noreferrer"
                    className="github-link">
                     View on GitHub
                 </a>
