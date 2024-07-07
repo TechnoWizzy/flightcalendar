@@ -34,3 +34,17 @@
 .airport-selection label {
   margin-right: 20px;
 }
+
+.footer {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.github-link {
+  color: #0366d6;
+  text-decoration: none;
+}
+
+.github-link:hover {
+  text-decoration: underline;
+}

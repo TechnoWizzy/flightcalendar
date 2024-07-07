@@ -106,6 +106,12 @@ function FlightCalender() {
                     onRangeChange={onRangeChange}
                 />
             </div>
+            <div className="footer">
+                <a href="https://github.com/TechnoWizzy/flightcalendar-frontend/" target="_blank" rel="noopener noreferrer"
+                   className="github-link">
+                    View on GitHub
+                </a>
+            </div>
         </div>
     );
 }
@@ -176,7 +182,7 @@ const calculateRange = (date: Date, view: string) => {
             start = moment(date).startOf('month').toDate();
             end = moment(date).endOf('month').toDate();
     }
-    return { newStart: start, newEnd: end };
+    return {newStart: start, newEnd: end};
 }
 
 const verifiedView = (view?: string | null) => {
