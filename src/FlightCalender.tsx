@@ -9,11 +9,11 @@ import Spinner from "./Spinner.tsx";
 const localizer = momentLocalizer(moment);
 
 function FlightCalender() {
-    const [ defaultView, setDefaultView ] = useQueryParam("view", StringParam);
-    const [ start, setStart ] = useQueryParam("start", DateParam);
-    const [ end, setEnd ] = useQueryParam("end", DateParam);
-    const [ sourceAirport, setSourceAirport ] = useQueryParam("from", StringParam);
-    const [ destinationAirport, setDestinationAirport ] = useQueryParam("to", StringParam);
+    const [ defaultView = "week", setDefaultView ] = useQueryParam("view", StringParam);
+    const [ start = getSundayOfCurrentWeek(), setStart ] = useQueryParam("start", DateParam);
+    const [ end= getSaturdayOfCurrentWeek(), setEnd ] = useQueryParam("end", DateParam);
+    const [ sourceAirport = "DTW", setSourceAirport ] = useQueryParam("from", StringParam);
+    const [ destinationAirport = "IND", setDestinationAirport ] = useQueryParam("to", StringParam);
 
     const onView = useCallback((newView: View) => setDefaultView(newView), [setDefaultView]);
 
@@ -57,7 +57,7 @@ function FlightCalender() {
                     From:
                     <select value={sourceAirport ?? undefined} onChange={(e) => {
                         setSourceAirport(e.target.value);
-                        window.location.reload();
+                        if (destinationAirport) window.location.reload();
                     }}>
                         <option value="">Select an airport</option>
                         {airports.map((airport) => (
@@ -71,7 +71,7 @@ function FlightCalender() {
                     To:
                     <select value={destinationAirport ?? undefined} onChange={(e) => {
                         setDestinationAirport(e.target.value);
-                        window.location.reload();
+                        if (sourceAirport) window.location.reload();
                     }}>
                         <option value="">Select an airport</option>
                         {airports.map((airport) => (
@@ -116,9 +116,37 @@ const formatFlights = (flights?: Flight[]) => {
             ...flight,
             start: new Date(flight.takeoff),
             end: new Date(flight.arrival),
-            title: `DL${flight.number} from ${flight.from} ${flight.details} to ${flight.to}`
+            title: flight.details
         }
     })
+}
+
+const getSundayOfCurrentWeek = () => {
+    const today = new Date();
+    const dayOfWeek = today.getDay(); // 0 for Sunday, 1 for Monday, ..., 6 for Saturday
+    const sunday = new Date(today);
+
+    // Calculate the date for the previous Sunday
+    sunday.setDate(today.getDate() - dayOfWeek);
+
+    // Set the time to the start of the day
+    sunday.setHours(0, 0, 0, 0);
+
+    return sunday;
+}
+
+const getSaturdayOfCurrentWeek = () => {
+    const today = new Date();
+    const dayOfWeek = today.getDay(); // 0 for Sunday, 1 for Monday, ..., 6 for Saturday
+    const saturday = new Date(today);
+
+    // Calculate the date for the upcoming Saturday
+    saturday.setDate(today.getDate() + (6 - dayOfWeek));
+
+    // Set the time to the start of the day
+    saturday.setHours(0, 0, 0, 0);
+
+    return saturday;
 }
 
 const calculateRange = (date: Date, view: string) => {
