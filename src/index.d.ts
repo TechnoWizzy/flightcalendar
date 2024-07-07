@@ -6,6 +6,7 @@ interface Flight {
     from: Airport;
     takeoff: string;
     arrival: string;
+    details: string;
 }
 
 interface Airport {
