@@ -1,19 +1,23 @@
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import {Calendar, momentLocalizer, View, Views} from "react-big-calendar";
+import {Calendar, Event, momentLocalizer, View, Views} from "react-big-calendar";
 import moment from "moment";
-import {useCallback} from "react";
+import {useCallback, useState} from "react";
 import {DateParam, StringParam, useQueryParam} from "use-query-params";
 import {useQuery} from "@tanstack/react-query";
 import Spinner from "./Spinner.tsx";
+import EventModal from "./EventModal.tsx";
 
 const localizer = momentLocalizer(moment);
 
-function FlightCalender() {
+export default function FlightCalender() {
     const [ defaultView = "week", setDefaultView ] = useQueryParam("view", StringParam);
     const [ start = getSundayOfCurrentWeek(), setStart ] = useQueryParam("start", DateParam);
     const [ end= getSaturdayOfCurrentWeek(), setEnd ] = useQueryParam("end", DateParam);
     const [ sourceAirport = "DTW", setSourceAirport ] = useQueryParam("from", StringParam);
     const [ destinationAirport = "IND", setDestinationAirport ] = useQueryParam("to", StringParam);
+
+    const [ selectedEvent, setSelectedEvent ] = useState(undefined as Event | undefined);
+    const [ modalState, setModalState ] = useState(false);
 
     const onView = useCallback((newView: View) => setDefaultView(newView), [setDefaultView]);
 
@@ -36,12 +40,22 @@ function FlightCalender() {
         setDefaultView(view);
     }, [setStart, setEnd]);
 
+    const onSelectEvent = useCallback((event: Event) => {
+        setSelectedEvent(event);
+        setModalState(true);
+    }, []);
+
+    const onCloseModal = () => {
+        setModalState(false);
+        setSelectedEvent(undefined);
+    };
+
     const { isPending, error, data } = useQuery({
         queryKey: [defaultView, start, end],
         queryFn: async () => {
             if (!sourceAirport || !destinationAirport) return [];
             return fetch(`${import.meta.env.VITE_API_URL}/flights/batch/?to=${destinationAirport}&from=${sourceAirport}&start=${start}&end=${end}`).then(res =>
-                res.json() as Promise<Flight[]>
+                res.json() as Promise<Trip[]>
             )
         }
 
@@ -84,7 +98,6 @@ function FlightCalender() {
                     </label>
                 </div>
             </div>
-
             <div className="calendar-container">
                 {isPending && (
                     <div className="spinner-overlay">
@@ -103,12 +116,16 @@ function FlightCalender() {
                     defaultView={verifiedView(defaultView)}
                     startAccessor="start"
                     endAccessor="end"
-                    events={formatFlights(data)}
+                    events={formatTrips(data)}
                     onView={onView}
                     onNavigate={onNavigate}
                     onRangeChange={onRangeChange}
+                    onSelectEvent={onSelectEvent}
                 />
             </div>
+            {modalState && selectedEvent && (
+                <EventModal event={selectedEvent as Trip} onClose={onCloseModal} />
+            )}
             <div className="footer">
                 <a href="https://github.com/TechnoWizzy/flightcalendar-frontend/" target="_blank"
                    rel="noopener noreferrer"
@@ -120,13 +137,13 @@ function FlightCalender() {
     );
 }
 
-const formatFlights = (flights?: Flight[]) => {
-    return flights?.map(flight => {
+const formatTrips = (trips?: Trip[]) => {
+    return trips?.map(trip => {
         return {
-            ...flight,
-            start: new Date(flight.takeoff),
-            end: new Date(flight.arrival),
-            title: flight.details
+            ...trip,
+            start: new Date(trip.start),
+            end: new Date(trip.end),
+            title: trip.legs.map(leg => `DL${leg.number}`).join('»')
         }
     })
 }
@@ -266,5 +283,3 @@ const airports: Airport[] = [
     { code: 'RIC', city: 'Richmond, VA'},
     { code: 'RNO', city: 'Reno, NV'},
 ].sort((a, b) => a.city.localeCompare(b.city));
-
-export default FlightCalender;

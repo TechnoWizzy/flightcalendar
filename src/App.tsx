@@ -6,7 +6,7 @@ import FlightCalender from "./FlightCalender.tsx";
 
 const queryClient = new QueryClient()
 
-function App() {
+export default function App() {
 
   return (
       <QueryClientProvider client={queryClient}>
@@ -14,5 +14,3 @@ function App() {
       </QueryClientProvider>
   )
 }
-
-export default App
