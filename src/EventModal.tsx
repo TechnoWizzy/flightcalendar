@@ -16,12 +16,12 @@ export default function EventModal({ event, onClose }: { event: Trip, onClose: (
                     <div key={index} className="flight-details">
                         <h3>Flight Number: {flight.number}</h3>
                         <p><strong>Status:</strong> {flight.status}</p>
-                        <p><strong>Carrier:</strong> {flight.carrier.name} ({flight.carrier.code})</p>
-                        <p><strong>Aircraft:</strong> {flight.aircraft.name} ({flight.aircraft.code})</p>
                         <p><strong>From:</strong> {flight.from.cityName} ({flight.from.code})</p>
                         <p><strong>To:</strong> {flight.to.cityName} ({flight.to.code})</p>
                         <p><strong>Departure:</strong> {moment(flight.departure).format('MMMM Do YYYY, h:mm A')} ({timeZone})</p>
                         <p><strong>Arrival:</strong> {moment(flight.arrival).format('MMMM Do YYYY, h:mm A')} ({timeZone})</p>
+                        <p><strong>Carrier:</strong> {flight.carrier.name} ({flight.carrier.code})</p>
+                        <p><strong>Aircraft:</strong> {flight.aircraft.name} ({flight.aircraft.code})</p>
                     </div>
                 ))}
 
