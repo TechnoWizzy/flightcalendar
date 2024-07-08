@@ -17,7 +17,7 @@ interface Flight {
 }
 
 interface DeltaStation {
-    code: Airport,
+    code: string,
     cityName: string
 }
 
