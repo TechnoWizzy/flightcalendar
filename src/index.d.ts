@@ -1,5 +1,6 @@
 interface Trip {
     number: string;
+    carrier: Carrier;
     legs: Flight[];
     start: Date;
     end: Date;
@@ -8,25 +9,25 @@ interface Trip {
 interface Flight {
     readonly number: string;
     readonly status: string;
-    readonly carrier: DeltaCarrier;
-    readonly aircraft: DeltaAircraft;
-    readonly from: DeltaStation;
-    readonly to: DeltaStation;
+    readonly carrier: Carrier;
+    readonly aircraft: Aircraft;
+    readonly from: Station;
+    readonly to: Station;
     readonly departure: Date;
     readonly arrival: Date;
 }
 
-interface DeltaStation {
+interface Station {
     code: string,
     cityName: string
 }
 
-interface DeltaAircraft {
+interface Aircraft {
     code: string;
     name: string;
 }
 
-interface DeltaCarrier {
+interface Carrier {
     code: Airline;
     name: string;
 }

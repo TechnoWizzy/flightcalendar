@@ -9,8 +9,6 @@ export default function EventModal({ event, onClose }: { event: Trip, onClose: (
             <div className="modal">
                 <button className="close-button" onClick={onClose}>X</button>
                 <h2>Trip Number: {event.number}</h2>
-                <p><strong>Start:</strong> {moment(event.start).format('MMMM Do YYYY, h:mm A')} ({timeZone})</p>
-                <p><strong>End:</strong> {moment(event.end).format('MMMM Do YYYY, h:mm A')} ({timeZone})</p>
 
                 {event.legs.map((flight, index) => (
                     <div key={index} className="flight-details">

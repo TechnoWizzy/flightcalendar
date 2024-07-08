@@ -63,9 +63,9 @@ export default function FlightCalender() {
 
     return (
         <div style={{height: "100dvh"}}>
-            <div className="header">
-                <p>Flight Calendar</p>
-            </div>
+            <header className="header">
+                <span className="header-title">Flight Calendar</span>
+            </header>
             <div className="airport-selection-container">
                 <div className="airport-selection">
                     <label>
@@ -121,16 +121,20 @@ export default function FlightCalender() {
                     onNavigate={onNavigate}
                     onRangeChange={onRangeChange}
                     onSelectEvent={onSelectEvent}
+                    eventPropGetter={(event) => {
+                        const trip = event as Trip;
+                        const {backgroundColor, border} = carrierToColor(trip.carrier);
+                        return {style: {backgroundColor, border, borderStyle: "solid", borderBlockWidth: 1.5}}
+                    }}
                 />
             </div>
             {modalState && selectedEvent && (
-                <EventModal event={selectedEvent as Trip} onClose={onCloseModal} />
+                <EventModal event={selectedEvent as Trip} onClose={onCloseModal}/>
             )}
             <div className="footer">
-                <a href="https://github.com/TechnoWizzy/flightcalendar-frontend/" target="_blank"
-                   rel="noopener noreferrer"
-                   className="github-link">
-                    View on GitHub
+                <p>Made by Kaden Hardesty</p>
+                <a href="https://github.com/TechnoWizzy/flightcalendar" target="_blank" className="github-link">
+                    <img src="/github.svg" alt="GitHub" className="github-icon"/>
                 </a>
             </div>
         </div>
@@ -146,6 +150,20 @@ const formatTrips = (trips?: Trip[]) => {
             title: trip.legs.map(leg => `DL${leg.number}`).join('»')
         }
     })
+}
+
+const carrierToColor = (carrier: Carrier) => {
+    switch (carrier.code) {
+        case "DL": {
+            return { backgroundColor: '#183d6e', border: '#d2212e' };
+        }
+
+        case "UA": {
+            return { backgroundColor: '#eeeff9', border: '#1415d0' };
+        }
+
+        default: return { backgroundColor: 'black', border: 'black' };
+    }
 }
 
 const getSundayOfCurrentWeek = () => {
