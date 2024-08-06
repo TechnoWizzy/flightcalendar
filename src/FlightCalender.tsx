@@ -127,11 +127,11 @@ export default function FlightCalender() {
                     </a>
                 </div>
             </header>
+            <div className="feedback-container">
+                <button className="feedback-button" onClick={() => setFeedbackModal(true)}>Feedback/Airport Request</button>
+            </div>
             <div className="airport-selection-container">
                 <div className="airport-selection">
-                    <button className="feedback-button" onClick={() => setFeedbackModal(true)}>Feedback/Airport
-                        Request
-                    </button>
                     <div className="airport-selection-content">
                         <label>
                             Origin:

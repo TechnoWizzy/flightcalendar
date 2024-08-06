@@ -54,7 +54,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 20px 0;
+  margin: 10px 0;
 }
 
 .airport-selection {
@@ -62,6 +62,13 @@
   align-items: center;
   gap: 20px;
 }
+
+.feedback-container {
+  display: flex;
+  justify-content: center;
+  padding: 5px;
+}
+
 
 .feedback-button {
   background-color: #28a745;
@@ -162,7 +169,7 @@ label {
   color: gray;
 }
 
-@media (min-width: 1000px) {
+@media (min-width: 1080px) {
   .content {
     flex-direction: row;
   }
