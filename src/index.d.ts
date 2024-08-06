@@ -13,8 +13,8 @@ interface Flight {
     readonly aircraft: Aircraft;
     readonly origin: Station;
     readonly destination: Station;
-    readonly takeoff: Date;
-    readonly arrival: Date;
+    readonly takeoff: string;
+    readonly arrival: string;
 }
 
 interface Station {

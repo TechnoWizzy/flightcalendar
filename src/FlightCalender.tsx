@@ -52,11 +52,12 @@ export default function FlightCalender() {
             if (!sourceAirport || !destinationAirport) return [];
             if (!start) return [];
             if (!end) return [];
-            const a = formateDate(start)
-            const b = formateDate(end)
-            return fetch(`${import.meta.env.VITE_API_URL}/flights/batch/?origin=${sourceAirport}&destination=${destinationAirport}&start=${a}&end=${b}`).then(res =>
-                res.json() as Promise<Trip[]>
-            )
+            const a = formatDate(start)
+            const b = formatDate(end)
+            return fetch(`${import.meta.env.VITE_API_URL}/flights/batch/?origin=${sourceAirport}&destination=${destinationAirport}&start=${a}&end=${b}`)
+                .then(res =>
+                    res.json() as Promise<Trip[]>
+                )
         }
 
     });
@@ -116,7 +117,7 @@ export default function FlightCalender() {
                     defaultView={verifiedView(defaultView)}
                     startAccessor="start"
                     endAccessor="end"
-                    events={formatTrips(data)}
+                    events={formatTrips(data, defaultView)}
                     onView={onView}
                     onNavigate={onNavigate}
                     onRangeChange={onRangeChange}
@@ -141,7 +142,23 @@ export default function FlightCalender() {
     );
 }
 
-const formateDate = (date: Date) => {
+const timelyDate = (date: Date) => {
+    let hours = date.getHours();
+    const minutes = date.getMinutes();
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+
+    // Convert hours from 24-hour to 12-hour format
+    hours = hours % 12;
+    hours = hours ? hours : 12; // the hour '0' should be '12'
+
+    // Format minutes with leading zero if necessary
+    const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
+
+    // Create the final formatted time string
+    return hours + ':' + formattedMinutes + ' ' + ampm;
+}
+
+const formatDate = (date: Date) => {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0'); // getMonth() returns month from 0-11, so we add 1
     const day = String(date.getDate()).padStart(2, '0');
@@ -149,13 +166,14 @@ const formateDate = (date: Date) => {
     return `${year}-${month}-${day}`;
 }
 
-const formatTrips = (trips?: Trip[]) => {
+const formatTrips = (trips?: Trip[], view?: string | null) => {
     return trips?.map(trip => {
+        const start = new Date(trip.start)
         return {
             ...trip,
             start: new Date(trip.start),
             end: new Date(trip.end),
-            title: trip.legs.map(leg => `DL${leg.number}`).join('»')
+            title: trip.legs.map(leg => view == "month" ? timelyDate(start) : `DL${leg.number}`).join('»')
         }
     })
 }
