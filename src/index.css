@@ -28,12 +28,14 @@
   font-family: 'Roboto', sans-serif;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   transition: background 0.3s ease, box-shadow 0.3s ease;
-  padding: 0 10px; /* Add padding to the sides */
+  padding: 0 10px;
+  position: relative;
 }
 
 .header-title {
-  text-align: center;
-  flex-grow: 1;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .social-links {
@@ -43,11 +45,10 @@
 }
 
 .buymeacoffee-icon, .github-icon {
-  height: 3.5dvh; /* Adjust the height as needed */
-  width: auto; /* Maintain aspect ratio */
-  margin: 0 10px; /* Add margins */
+  height: 3.5dvh;
+  width: auto;
+  margin: 0 10px;
 }
-
 
 .airport-selection-container {
   display: flex;
