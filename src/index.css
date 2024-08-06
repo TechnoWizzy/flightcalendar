@@ -44,15 +44,21 @@
   padding: 20px;
   font-size: 2vh;
   width: 100%;
+  gap: 10px; /* Adjust spacing between buttons */
   box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.github-link {
+.social-links {
   display: flex;
   align-items: center;
-  margin-top: 10px;
-  text-decoration: none;
+  gap: 40px; /* Adjust spacing between the icons */
 }
+
+.buymeacoffee-link img, .github-link img {
+  height: 60px; /* Adjust size as needed */
+  width: auto;
+}
+
 
 .github-icon {
   width: 3.5vh;

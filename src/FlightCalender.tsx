@@ -133,10 +133,14 @@ export default function FlightCalender() {
                 <EventModal event={selectedEvent as Trip} onClose={onCloseModal}/>
             )}
             <div className="footer">
-                <p>Made by Kaden Hardesty</p>
-                <a href="https://github.com/TechnoWizzy/flightcalendar" target="_blank" className="github-link">
-                    <img src="/github.svg" alt="GitHub" className="github-icon"/>
-                </a>
+                <div className="social-links">
+                    <a href="https://buymeacoffee.com/khardesty1w" target="_blank" className="buymeacoffee-link">
+                        <img src="/buymeacoffee.png" alt="Buy Me a Coffee" className="buymeacoffee-icon"/>
+                    </a>
+                    <a href="https://github.com/TechnoWizzy/flightcalendar" target="_blank" className="github-link">
+                        <img src="/github.svg" alt="GitHub" className="github-icon"/>
+                    </a>
+                </div>
             </div>
         </div>
     );
