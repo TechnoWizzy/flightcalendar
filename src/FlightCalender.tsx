@@ -20,6 +20,8 @@ export default function FlightCalender() {
 
     const [selectedEvent, setSelectedEvent] = useState(undefined as Event | undefined);
     const [modalState, setModalState] = useState(false);
+    const [feedbackModal, setFeedbackModal] = useState(false);
+    const [feedbackText, setFeedbackText] = useState('');
 
     useEffect(() => {
         if (!start || !end) {
@@ -71,6 +73,28 @@ export default function FlightCalender() {
         window.location.reload();
     }, [setSourceAirport, setDestinationAirport]);
 
+    const handleSubmitFeedback = async () => {
+        if (feedbackText.trim() === '') return;
+
+        const webhookUrl = import.meta.env.VITE_FEEDBACK_WEBHOOK_URL;
+
+        const embed = {
+            description: feedbackText,
+            color: 3447003 // A light blue color
+        };
+
+        await fetch(webhookUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ embeds: [embed] })
+        });
+
+        setFeedbackText('');
+        setFeedbackModal(false);
+    };
+
     const { isPending, error, data } = useQuery({
         queryKey: [defaultView, start, end],
         queryFn: async () => {
@@ -93,8 +117,11 @@ export default function FlightCalender() {
             <header className="header">
                 <div className="social-links">
                     <a href="https://buymeacoffee.com/khardesty1w" target="_blank" className="buymeacoffee-link">
-                        <img src="/buymeacoffee.png" alt="Buy Me a Coffee" className="buymeacoffee-icon" />
+                        <img src="/buymeacoffee.png" alt="Buy Me a Coffee" className="buymeacoffee-icon"/>
                     </a>
+                    <button className="feedback-button" onClick={() => setFeedbackModal(true)}>Feedback/Airport
+                        Request
+                    </button>
                 </div>
                 <span className="header-title">Flight Calendar</span>
                 <div className="social-links">
@@ -169,6 +196,20 @@ export default function FlightCalender() {
             </div>
             {modalState && selectedEvent && (
                 <EventModal event={selectedEvent as Trip} onClose={onCloseModal} />
+            )}
+            {feedbackModal && (
+                <div className="modal-overlay">
+                    <div className="modal-content">
+                        <h2>Feedback/Airport Request</h2>
+                        <textarea
+                            value={feedbackText}
+                            onChange={(e) => setFeedbackText(e.target.value)}
+                            placeholder="Type feedback/request here"
+                        ></textarea>
+                        <button onClick={handleSubmitFeedback}>Submit</button>
+                        <button onClick={() => setFeedbackModal(false)}>Close</button>
+                    </div>
+                </div>
             )}
         </div>
     );
