@@ -7,6 +7,7 @@ import {useQuery} from "@tanstack/react-query";
 import Spinner from "./Spinner.tsx";
 import EventModal from "./EventModal.tsx";
 import airports from "./Airports.ts";
+import posthog from "posthog-js";
 
 const localizer = momentLocalizer(moment);
 
@@ -82,6 +83,11 @@ export default function FlightCalender() {
                 .then(res => res.json() as Promise<Trip[]>)
         }
     });
+
+    useEffect(() => {
+        posthog.capture('pageview', { path: window.location.pathname });
+        // Other effect code here
+    }, []);
 
     return (
         <div style={{ height: "100%" }}>
