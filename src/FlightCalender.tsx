@@ -113,60 +113,62 @@ export default function FlightCalender() {
     }, []);
 
     return (
-        <div style={{ height: "100%" }}>
+        <div style={{height: "100%"}}>
             <header className="header">
                 <div className="social-links">
                     <a href="https://buymeacoffee.com/khardesty1w" target="_blank" className="buymeacoffee-link">
                         <img src="/buymeacoffee.png" alt="Buy Me a Coffee" className="buymeacoffee-icon"/>
                     </a>
-                    <button className="feedback-button" onClick={() => setFeedbackModal(true)}>Feedback/Airport
-                        Request
-                    </button>
                 </div>
                 <span className="header-title">Flight Calendar</span>
                 <div className="social-links">
                     <a href="https://github.com/TechnoWizzy/flightcalendar" target="_blank" className="github-link">
-                        <img src="/github.svg" alt="GitHub" className="github-icon" />
+                        <img src="/github.svg" alt="GitHub" className="github-icon"/>
                     </a>
                 </div>
             </header>
             <div className="airport-selection-container">
                 <div className="airport-selection">
-                    <label>
-                        Origin:
-                        <select value={sourceAirport ?? undefined} onChange={(e) => {
-                            setSourceAirport(e.target.value);
-                            if (destinationAirport) window.location.reload();
-                        }}>
-                            <option value="">Select an airport</option>
-                            {airports.map((airport) => (
-                                <option key={airport.code} value={airport.code}>
-                                    {airport.city} ({airport.code})
-                                </option>
-                            ))}
-                        </select>
-                    </label>
-                    <button className="swap-button" onClick={swapAirports}>Swap</button>
-                    <label>
-                        Destination:
-                        <select value={destinationAirport ?? undefined} onChange={(e) => {
-                            setDestinationAirport(e.target.value);
-                            if (sourceAirport) window.location.reload();
-                        }}>
-                            <option value="">Select an airport</option>
-                            {airports.map((airport) => (
-                                <option key={airport.code} value={airport.code}>
-                                    {airport.city} ({airport.code})
-                                </option>
-                            ))}
-                        </select>
-                    </label>
+                    <button className="feedback-button" onClick={() => setFeedbackModal(true)}>Feedback/Airport
+                        Request
+                    </button>
+                    <div className="airport-selection-content">
+                        <label>
+                            Origin:
+                            <select value={sourceAirport ?? undefined} onChange={(e) => {
+                                setSourceAirport(e.target.value);
+                                if (destinationAirport) window.location.reload();
+                            }}>
+                                <option value="">Select an airport</option>
+                                {airports.map((airport) => (
+                                    <option key={airport.code} value={airport.code}>
+                                        {airport.city} ({airport.code})
+                                    </option>
+                                ))}
+                            </select>
+                        </label>
+                        <button className="swap-button" onClick={swapAirports}>Swap</button>
+                        <label>
+                            Destination:
+                            <select value={destinationAirport ?? undefined} onChange={(e) => {
+                                setDestinationAirport(e.target.value);
+                                if (sourceAirport) window.location.reload();
+                            }}>
+                                <option value="">Select an airport</option>
+                                {airports.map((airport) => (
+                                    <option key={airport.code} value={airport.code}>
+                                        {airport.city} ({airport.code})
+                                    </option>
+                                ))}
+                            </select>
+                        </label>
+                    </div>
                 </div>
             </div>
             <div className="calendar-container">
                 {isPending && (
                     <div className="spinner-overlay">
-                        <Spinner />
+                        <Spinner/>
                         <p>Loading Flight Data...</p>
                     </div>
                 )}
@@ -189,13 +191,13 @@ export default function FlightCalender() {
                     onSelectEvent={onSelectEvent}
                     eventPropGetter={(event) => {
                         const trip = event as Trip;
-                        const { backgroundColor, border } = carrierToColor(trip.carrier);
-                        return { style: { backgroundColor, border, borderStyle: "solid", borderBlockWidth: 1.5 } };
+                        const {backgroundColor, border} = carrierToColor(trip.carrier);
+                        return {style: {backgroundColor, border, borderStyle: "solid", borderBlockWidth: 1.5}};
                     }}
                 />
             </div>
             {modalState && selectedEvent && (
-                <EventModal event={selectedEvent as Trip} onClose={onCloseModal} />
+                <EventModal event={selectedEvent as Trip} onClose={onCloseModal}/>
             )}
             {feedbackModal && (
                 <div className="modal-overlay">
