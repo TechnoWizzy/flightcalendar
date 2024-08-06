@@ -8,7 +8,7 @@ import { QueryParamProvider } from 'use-query-params';
 import posthog from "posthog-js";
 
 posthog.init(import.meta.env.VITE_POSTHOG_API_KEY, {
-    api_host: `${import.meta.env.VITE_PUBLIC_POSTHOG_HOST}`,
+    api_host: "/ingest",
     autocapture: false,
     capture_pageview: false,
 });

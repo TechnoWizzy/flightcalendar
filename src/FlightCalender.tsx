@@ -86,7 +86,6 @@ export default function FlightCalender() {
 
     useEffect(() => {
         posthog.capture('pageview', { path: window.location.pathname });
-        // Other effect code here
     }, []);
 
     return (
