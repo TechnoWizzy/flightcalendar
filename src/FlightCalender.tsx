@@ -1,25 +1,40 @@
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import {Calendar, Event, momentLocalizer, View, Views} from "react-big-calendar";
 import moment from "moment";
-import {useCallback, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import {DateParam, StringParam, useQueryParam} from "use-query-params";
 import {useQuery} from "@tanstack/react-query";
 import Spinner from "./Spinner.tsx";
 import EventModal from "./EventModal.tsx";
+import airports from "./Airports.ts";
 
 const localizer = momentLocalizer(moment);
 
 export default function FlightCalender() {
-    const [ defaultView = "week", setDefaultView ] = useQueryParam("view", StringParam);
-    const [ start = getSundayOfCurrentWeek(), setStart ] = useQueryParam("start", DateParam);
-    const [ end= getSaturdayOfCurrentWeek(), setEnd ] = useQueryParam("end", DateParam);
-    const [ sourceAirport = "DTW", setSourceAirport ] = useQueryParam("from", StringParam);
-    const [ destinationAirport = "IND", setDestinationAirport ] = useQueryParam("to", StringParam);
+    const [defaultView = "week", setDefaultView] = useQueryParam("view", StringParam);
+    const [start, setStart] = useQueryParam("start", DateParam);
+    const [end, setEnd] = useQueryParam("end", DateParam);
+    const [sourceAirport = "DTW", setSourceAirport] = useQueryParam("from", StringParam);
+    const [destinationAirport = "IND", setDestinationAirport] = useQueryParam("to", StringParam);
 
-    const [ selectedEvent, setSelectedEvent ] = useState(undefined as Event | undefined);
-    const [ modalState, setModalState ] = useState(false);
+    const [selectedEvent, setSelectedEvent] = useState(undefined as Event | undefined);
+    const [modalState, setModalState] = useState(false);
 
-    const onView = useCallback((newView: View) => setDefaultView(newView), [setDefaultView]);
+    useEffect(() => {
+        if (!start || !end) {
+            const { newStart, newEnd } = calculateRange(new Date(), defaultView ?? "week");
+            setStart(newStart);
+            setEnd(newEnd);
+        }
+    }, [defaultView, setStart, setEnd]);
+
+    const onView = useCallback((newView: View) => {
+        setDefaultView(newView);
+        const { newStart, newEnd } = calculateRange(new Date(), newView);
+        setStart(newStart);
+        setEnd(newEnd);
+    }, [setDefaultView, setStart, setEnd]);
+
     const onRangeChange = useCallback((newRange: Date[] | { start: Date, end: Date }) => {
         if (Array.isArray(newRange)) {
             const newStart = newRange[0];
@@ -31,20 +46,29 @@ export default function FlightCalender() {
             setEnd(newRange.end);
         }
     }, [setStart, setEnd]);
+
     const onNavigate = useCallback((newDate: Date, view: View) => {
         const { newStart, newEnd } = calculateRange(newDate, view);
         setStart(newStart);
         setEnd(newEnd);
         setDefaultView(view);
     }, [setStart, setEnd]);
+
     const onSelectEvent = useCallback((event: Event) => {
         setSelectedEvent(event);
         setModalState(true);
     }, []);
-    const onCloseModal = () => {
+
+    const onCloseModal = useCallback(() => {
         setModalState(false);
         setSelectedEvent(undefined);
-    };
+    }, [setModalState, setSelectedEvent]);
+
+    const swapAirports = useCallback(() => {
+        setSourceAirport(destinationAirport);
+        setDestinationAirport(sourceAirport);
+        window.location.reload();
+    }, [setSourceAirport, setDestinationAirport]);
 
     const { isPending, error, data } = useQuery({
         queryKey: [defaultView, start, end],
@@ -52,25 +76,32 @@ export default function FlightCalender() {
             if (!sourceAirport || !destinationAirport) return [];
             if (!start) return [];
             if (!end) return [];
-            const a = formatDate(start)
-            const b = formatDate(end)
+            const a = formatDate(start);
+            const b = formatDate(end);
             return fetch(`${import.meta.env.VITE_API_URL}/flights/batch/?origin=${sourceAirport}&destination=${destinationAirport}&start=${a}&end=${b}`)
-                .then(res =>
-                    res.json() as Promise<Trip[]>
-                )
+                .then(res => res.json() as Promise<Trip[]>)
         }
-
     });
 
     return (
-        <div style={{height: "100dvh"}}>
+        <div style={{ height: "100%" }}>
             <header className="header">
+                <div className="social-links">
+                    <a href="https://buymeacoffee.com/khardesty1w" target="_blank" className="buymeacoffee-link">
+                        <img src="/buymeacoffee.png" alt="Buy Me a Coffee" className="buymeacoffee-icon" />
+                    </a>
+                </div>
                 <span className="header-title">Flight Calendar</span>
+                <div className="social-links">
+                    <a href="https://github.com/TechnoWizzy/flightcalendar" target="_blank" className="github-link">
+                        <img src="/github.svg" alt="GitHub" className="github-icon" />
+                    </a>
+                </div>
             </header>
             <div className="airport-selection-container">
                 <div className="airport-selection">
                     <label>
-                        From:
+                        Origin:
                         <select value={sourceAirport ?? undefined} onChange={(e) => {
                             setSourceAirport(e.target.value);
                             if (destinationAirport) window.location.reload();
@@ -83,8 +114,9 @@ export default function FlightCalender() {
                             ))}
                         </select>
                     </label>
+                    <button className="swap-button" onClick={swapAirports}>Swap</button>
                     <label>
-                        To:
+                        Destination:
                         <select value={destinationAirport ?? undefined} onChange={(e) => {
                             setDestinationAirport(e.target.value);
                             if (sourceAirport) window.location.reload();
@@ -102,7 +134,7 @@ export default function FlightCalender() {
             <div className="calendar-container">
                 {isPending && (
                     <div className="spinner-overlay">
-                        <Spinner/>
+                        <Spinner />
                         <p>Loading Flight Data...</p>
                     </div>
                 )}
@@ -113,7 +145,8 @@ export default function FlightCalender() {
                 )}
                 <Calendar
                     localizer={localizer}
-                    defaultDate={start ?? new Date()}
+                    views={['month', 'week', 'day']}
+                    defaultDate={defaultDate(start, end)}
                     defaultView={verifiedView(defaultView)}
                     startAccessor="start"
                     endAccessor="end"
@@ -124,27 +157,18 @@ export default function FlightCalender() {
                     onSelectEvent={onSelectEvent}
                     eventPropGetter={(event) => {
                         const trip = event as Trip;
-                        const {backgroundColor, border} = carrierToColor(trip.carrier);
-                        return {style: {backgroundColor, border, borderStyle: "solid", borderBlockWidth: 1.5}}
+                        const { backgroundColor, border } = carrierToColor(trip.carrier);
+                        return { style: { backgroundColor, border, borderStyle: "solid", borderBlockWidth: 1.5 } };
                     }}
                 />
             </div>
             {modalState && selectedEvent && (
-                <EventModal event={selectedEvent as Trip} onClose={onCloseModal}/>
+                <EventModal event={selectedEvent as Trip} onClose={onCloseModal} />
             )}
-            <div className="footer">
-                <div className="social-links">
-                    <a href="https://buymeacoffee.com/khardesty1w" target="_blank" className="buymeacoffee-link">
-                        <img src="/buymeacoffee.png" alt="Buy Me a Coffee" className="buymeacoffee-icon"/>
-                    </a>
-                    <a href="https://github.com/TechnoWizzy/flightcalendar" target="_blank" className="github-link">
-                        <img src="/github.svg" alt="GitHub" className="github-icon"/>
-                    </a>
-                </div>
-            </div>
         </div>
     );
 }
+
 
 const timelyDate = (date: Date) => {
     let hours = date.getHours();
@@ -173,11 +197,13 @@ const formatDate = (date: Date) => {
 const formatTrips = (trips?: Trip[], view?: string | null) => {
     return trips?.map(trip => {
         const start = new Date(trip.start)
+        const end = new Date(trip.end)
+        const title = view == "month" ? `${timelyDate(start)}-${timelyDate(end)}` : trip.legs.map(leg => `DL${leg.number}`).join('»');
         return {
             ...trip,
             start: new Date(trip.start),
             end: new Date(trip.end),
-            title: trip.legs.map(leg => view == "month" ? timelyDate(start) : `DL${leg.number}`).join('»')
+            title: title
         }
     })
 }
@@ -185,43 +211,16 @@ const formatTrips = (trips?: Trip[], view?: string | null) => {
 const carrierToColor = (carrier: Carrier) => {
     switch (carrier.code) {
         case "DL": {
-            return { backgroundColor: '#183d6e', border: '#d2212e' };
+            return {backgroundColor: '#183d6e', border: '#d2212e'};
         }
 
         case "UA": {
-            return { backgroundColor: '#eeeff9', border: '#1415d0' };
+            return {backgroundColor: '#eeeff9', border: '#1415d0'};
         }
 
-        default: return { backgroundColor: 'black', border: 'black' };
+        default:
+            return {backgroundColor: 'black', border: 'black'};
     }
-}
-
-const getSundayOfCurrentWeek = () => {
-    const today = new Date();
-    const dayOfWeek = today.getDay(); // 0 for Sunday, 1 for Monday, ..., 6 for Saturday
-    const sunday = new Date(today);
-
-    // Calculate the date for the previous Sunday
-    sunday.setDate(today.getDate() - dayOfWeek);
-
-    // Set the time to the start of the day
-    sunday.setHours(0, 0, 0, 0);
-
-    return sunday;
-}
-
-const getSaturdayOfCurrentWeek = () => {
-    const today = new Date();
-    const dayOfWeek = today.getDay(); // 0 for Sunday, 1 for Monday, ..., 6 for Saturday
-    const saturday = new Date(today);
-
-    // Calculate the date for the upcoming Saturday
-    saturday.setDate(today.getDate() + (6 - dayOfWeek));
-
-    // Set the time to the start of the day
-    saturday.setHours(0, 0, 0, 0);
-
-    return saturday;
 }
 
 const calculateRange = (date: Date, view: string) => {
@@ -263,71 +262,9 @@ const verifiedView = (view?: string | null) => {
     return Views.MONTH;
 }
 
-const airports: Airport[] = [
-    { code: 'ATL', city: 'Atlanta, GA' },
-    { code: 'LAX', city: 'Los Angeles, CA' },
-    { code: 'ORD', city: 'Chicago, IL' },
-    { code: 'DFW', city: 'Dallas, TX' },
-    { code: 'DEN', city: 'Denver, CO' },
-    { code: 'IND', city: 'Indianapolis, IN'},
-    { code: 'DTW', city: 'Detroit, MI'},
-    { code: 'JFK', city: 'New York City, NY'},
-    { code: 'LAS', city: 'Las Vegas, NV'},
-    { code: 'MCO', city: 'Orlando, FL'},
-    { code: 'MIA', city: 'Miami, Fl'},
-    { code: 'CLT', city: 'Charlotte, NC'},
-    { code: 'SEA', city: 'Seattle, WA'},
-    { code: 'PHX', city: 'Phoenix, AZ'},
-    { code: 'EWR', city: 'Newark, NJ'},
-    { code: 'SFO', city: 'San Francisco, CA'},
-    { code: 'IAH', city: 'Houston, TX'},
-    { code: 'BOS', city: 'Boston, MA'},
-    { code: 'FLL', city: 'Fort Lauderdale, FL'},
-    { code: 'MSP', city: 'Minneapolis, MN'},
-    { code: 'LGA', city: 'New York City, NY'},
-    { code: 'PHL', city: 'Philadelphia, PA'},
-    { code: 'SLC', city: 'Salt Lake City, UT'},
-    { code: 'DCA', city: 'Washington DC, VA'},
-    { code: 'SAN', city: 'San Diego, CA'},
-    { code: 'BWI', city: 'Baltimore, MD'},
-    { code: 'TPA', city: 'Tampa, FL'},
-    { code: 'AUS', city: 'Austin, TX'},
-    { code: 'IAD', city: 'Washington DC, VA'},
-    { code: 'BNA', city: 'Nashville, TN'},
-    { code: 'MDW', city: 'Chicago, IL'},
-    { code: 'HNL', city: 'Honolulu, HI'},
-    { code: 'DAL', city: 'Dallas, TX'},
-    { code: 'PDX', city: 'Portland, OR'},
-    { code: 'STL', city: 'St Louis, MO'},
-    { code: 'HOU', city: 'Houston, TX'},
-    { code: 'SMF', city: 'Sacramento, CA'},
-    { code: 'MSY', city: 'New Orleans, LA'},
-    { code: 'RDU', city: 'Raleigh, NC'},
-    { code: 'MLI', city: 'Moline, IL'},
-    { code: 'SJC', city: 'San Jose, CA'},
-    { code: 'SNA', city: 'Santa Ana, CA'},
-    { code: 'OAK', city: 'Oakland, CA'},
-    { code: 'RSW', city: 'Fort Myers, FL'},
-    { code: 'SJU', city: 'San Juan, CA'},
-    { code: 'MCI', city: 'Kansas City, MO'},
-    { code: 'SAT', city: 'San Antonio, TX'},
-    { code: 'CLE', city: 'Cleveland, OH'},
-    { code: 'OGG', city: 'Maui, HI'},
-    { code: 'PIT', city: 'Pittsburgh, PA'},
-    { code: 'CVG', city: 'Cincinnati, OH'},
-    { code: 'CMH', city: 'Columbus, OH'},
-    { code: 'PBI', city: 'West Palm Beach, FL'},
-    { code: 'JAX', city: 'Jacksonville, FL'},
-    { code: 'BUR', city: 'Burbank, CA'},
-    { code: 'BDL', city: 'Hartford, CT'},
-    { code: 'ONT', city: 'Ontario, CA'},
-    { code: 'MKE', city: 'Milwaukee, WI'},
-    { code: 'CHS', city: 'Charleston, SC'},
-    { code: 'ANC', city: 'Anchorage, AK'},
-    { code: 'ABQ', city: 'Albuquerque, NW'},
-    { code: 'BOI', city: 'Boise, ID'},
-    { code: 'OMA', city: 'Omaha, NE'},
-    { code: 'MEM', city: 'Memphis'},
-    { code: 'RIC', city: 'Richmond, VA'},
-    { code: 'RNO', city: 'Reno, NV'},
-].sort((a, b) => a.city.localeCompare(b.city));
+const defaultDate = (start?: Date | null, end?: Date | null) => {
+    if (!start) return new Date();
+    if (!end) return start;
+    const halfTime = end.getTime() - start.getTime()
+    return new Date(start.getTime() + halfTime)
+}
