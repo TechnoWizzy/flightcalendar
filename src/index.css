@@ -54,7 +54,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 10px 0;
+  margin: 5px 0;
 }
 
 .airport-selection {
@@ -66,7 +66,7 @@
 .feedback-container {
   display: flex;
   justify-content: center;
-  padding: 5px;
+  padding: 10px 0;
 }
 
 
