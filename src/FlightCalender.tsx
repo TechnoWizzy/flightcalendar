@@ -20,7 +20,6 @@ export default function FlightCalender() {
     const [ modalState, setModalState ] = useState(false);
 
     const onView = useCallback((newView: View) => setDefaultView(newView), [setDefaultView]);
-
     const onRangeChange = useCallback((newRange: Date[] | { start: Date, end: Date }) => {
         if (Array.isArray(newRange)) {
             const newStart = newRange[0];
@@ -32,19 +31,16 @@ export default function FlightCalender() {
             setEnd(newRange.end);
         }
     }, [setStart, setEnd]);
-
     const onNavigate = useCallback((newDate: Date, view: View) => {
         const { newStart, newEnd } = calculateRange(newDate, view);
         setStart(newStart);
         setEnd(newEnd);
         setDefaultView(view);
     }, [setStart, setEnd]);
-
     const onSelectEvent = useCallback((event: Event) => {
         setSelectedEvent(event);
         setModalState(true);
     }, []);
-
     const onCloseModal = () => {
         setModalState(false);
         setSelectedEvent(undefined);
@@ -54,7 +50,11 @@ export default function FlightCalender() {
         queryKey: [defaultView, start, end],
         queryFn: async () => {
             if (!sourceAirport || !destinationAirport) return [];
-            return fetch(`${import.meta.env.VITE_API_URL}/flights/batch/?to=${destinationAirport}&from=${sourceAirport}&start=${start}&end=${end}`).then(res =>
+            if (!start) return [];
+            if (!end) return [];
+            const a = formateDate(start)
+            const b = formateDate(end)
+            return fetch(`${import.meta.env.VITE_API_URL}/flights/batch/?origin=${sourceAirport}&destination=${destinationAirport}&start=${a}&end=${b}`).then(res =>
                 res.json() as Promise<Trip[]>
             )
         }
@@ -139,6 +139,14 @@ export default function FlightCalender() {
             </div>
         </div>
     );
+}
+
+const formateDate = (date: Date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // getMonth() returns month from 0-11, so we add 1
+    const day = String(date.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
 }
 
 const formatTrips = (trips?: Trip[]) => {

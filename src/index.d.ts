@@ -11,15 +11,15 @@ interface Flight {
     readonly status: string;
     readonly carrier: Carrier;
     readonly aircraft: Aircraft;
-    readonly from: Station;
-    readonly to: Station;
-    readonly departure: Date;
+    readonly origin: Station;
+    readonly destination: Station;
+    readonly takeoff: Date;
     readonly arrival: Date;
 }
 
 interface Station {
     code: string,
-    cityName: string
+    city_name: string
 }
 
 interface Aircraft {
