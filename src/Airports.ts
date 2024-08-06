@@ -72,6 +72,7 @@ const airports: Airport[]  = [
     { code: 'TUS', city: 'Tuscon, AZ'},
     { code: 'CHA', city: 'Chattanooga, TN'},
     { code: 'SAV', city: 'Savannah, GA'},
+    { code: 'MYR', city: 'Myrtle Beach, SC'}
 ].sort((a, b) => a.city.localeCompare(b.city));
 
 export default airports;
