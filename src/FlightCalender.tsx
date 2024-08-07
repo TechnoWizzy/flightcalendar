@@ -243,6 +243,7 @@ const formatDate = (date: Date) => {
 }
 
 const formatTrips = (trips?: Trip[], view?: string | null) => {
+    if (!trips) return []
     return trips?.map(trip => {
         const start = new Date(trip.start)
         const end = new Date(trip.end)
