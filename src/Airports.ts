@@ -77,10 +77,14 @@ const airports: Airport[]  = [
     { code: 'TYS', city: 'Knoxville, TN'},
     { code: 'SRQ', city: 'Sarasota, FL'},
     { code: 'GEG', city: 'Spokane, WA'},
+    { code: 'GRB', city: 'Green Bay, WI' },
+    { code: 'ATW', city: 'Appleton, WI' },
     { code: 'HSV', city: 'Huntsville, AL'},
     { code: 'RAP', city: 'Rapid City, SD'},
     { code: 'KSHV', city: 'Shreveport, LA'},
-    { code: 'KDSM', city: 'Des Moines, IA' }
+    { code: 'KDSM', city: 'Des Moines, IA' },
+
+
 ].sort((a, b) => a.city.localeCompare(b.city));
 
 export default airports;
