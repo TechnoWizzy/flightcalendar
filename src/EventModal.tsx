@@ -1,8 +1,7 @@
-import moment from "moment";
-import momentTZ from "moment-timezone";
+import moment from "moment-timezone";
 
 export default function EventModal({ event, onClose }: { event: Trip, onClose: () => void }) {
-    const timeZone = momentTZ.tz(momentTZ.tz.guess()).zoneAbbr();
+    const timeZone = moment.tz(moment.tz.guess()).zoneAbbr();
 
     return (
         <div className="modal-overlay">

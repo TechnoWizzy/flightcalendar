@@ -1,6 +1,6 @@
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import {Calendar, Event, momentLocalizer, View, Views} from "react-big-calendar";
-import moment from "moment";
+import moment from "moment-timezone";
 import {useCallback, useEffect, useState} from "react";
 import {DateParam, StringParam, useQueryParam} from "use-query-params";
 import {useQuery} from "@tanstack/react-query";
