@@ -174,7 +174,7 @@ export default function FlightCalender() {
                 )}
                 {error && (
                     <div className="error-message">
-                        <p>An Error Occurred Loading Flight Data... :(</p>
+                        <p>The FlightCalendar API is currently down to perform necessary updates and improvements. Please check back tomorrow.</p>
                     </div>
                 )}
                 <Calendar
